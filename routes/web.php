@@ -46,7 +46,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     });
 
     // Lending Detail
-    Route::get('/items/lending/detail/{item}', [LendingController::class, 'detail'])->name('items.lending.detail');
+    // Route::get('/items/lending/detail/{item}', [LendingController::class, 'detail'])->name('items.lending.detail');
 
     // Users
     Route::controller(UserController::class)->prefix('users')->name('users.')->group(function () {
@@ -70,5 +70,17 @@ Route::middleware(['auth', 'role:operator'])->prefix('operator')->name('operator
     // Lending
     Route::controller(LendingController::class)->prefix('lending')->name('lending.')->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get('/detail/{item}', 'detail')->name('detail');
+        Route::get('/export', 'export')->name('export');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::post('/{lending}/return', 'returnItem')->name('return');
+        Route::delete('/{lending}', 'destroy')->name('destroy');
+    });
+
+    // Profile
+    Route::controller(UserController::class)->prefix('users')->name('profile.')->group(function () {
+        Route::get('/edit', 'operatorProfileEdit')->name('edit');
+        Route::post('/edit', 'operatorProfileUpdate')->name('update');
     });
 });

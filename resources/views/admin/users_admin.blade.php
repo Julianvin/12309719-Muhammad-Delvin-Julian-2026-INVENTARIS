@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="bg-white rounded-md shadow-sm border border-gray-100 p-8 w-full">
-    <!-- Session Alert for Password Display -->
     @if(session('success'))
     <div class="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r shadow-sm">
         <div class="flex">

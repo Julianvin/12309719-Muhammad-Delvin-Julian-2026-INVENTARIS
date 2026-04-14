@@ -15,6 +15,7 @@ class Lending extends Model
         'ket',
         'total',
         'user_id',
+        'different_user',
         'returned_at',
     ];
 
@@ -30,5 +31,10 @@ class Lending extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function differentUser()
+    {
+        return $this->belongsTo(User::class, 'different_user');
     }
 }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('ket')->nullable();
             $table->integer('total')->default(0);
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('different_user')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->timestamp('returned_at')->nullable();
         });

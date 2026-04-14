@@ -12,7 +12,7 @@ class LendingController extends Controller
 {
     public function index()
     {
-        $lendings = Lending::with(['item', 'user'])->orderBy('id', 'desc')->get();
+        $lendings = Lending::with(['item', 'user', 'differentUser'])->orderBy('id', 'desc')->paginate(10);
         return view('operator.lending', compact('lendings'));
     }
 
@@ -24,7 +24,7 @@ class LendingController extends Controller
 
     public function create()
     {
-        $items = Item::all()->filter(function($item) {
+        $items = Item::all()->filter(function ($item) {
             return ($item->total - $item->repair - $item->lending) > 0;
         });
 
@@ -69,7 +69,6 @@ class LendingController extends Controller
 
             DB::commit();
             return redirect('/operator/lending')->with('success', 'Success add new lending items!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage())->withInput();
@@ -85,16 +84,20 @@ class LendingController extends Controller
         try {
             DB::beginTransaction();
 
-            $lending->update([
-                'returned_at' => now(),
-            ]);
+            $currentUserId = auth()->id();
+            $updateData = ['returned_at' => now()];
+
+            if ($currentUserId !== $lending->user_id) {
+                $updateData['different_user'] = $currentUserId;
+            }
+
+            $lending->update($updateData);
 
             // Adjust stock
             $lending->item->decrement('lending', $lending->total);
 
             DB::commit();
             return back()->with('success', 'Item returned successfully');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Failed to return item');
@@ -115,7 +118,6 @@ class LendingController extends Controller
 
             DB::commit();
             return back()->with('success', 'Lending record deleted');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Failed to delete record');

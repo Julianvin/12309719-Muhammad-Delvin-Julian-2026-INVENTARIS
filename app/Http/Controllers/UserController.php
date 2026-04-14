@@ -115,4 +115,35 @@ class UserController extends Controller
     {
         return Excel::download(new UsersExport('operator'), 'operator-accounts.xlsx');
     }
+
+    public function operatorProfileEdit()
+    {
+        $user = Auth::user();
+        return view('operator.users_edit', compact('user'));
+    }
+
+    public function operatorProfileUpdate(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:4'
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+            $data['plain_password'] = null;
+        }
+
+        $user->update($data);
+
+        return back()->with('success', 'Profil berhasil diperbarui');
+    }
 }
